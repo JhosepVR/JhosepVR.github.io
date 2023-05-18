@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultas - Tienda Virtual</title>
+    <link rel="stylesheet" href="prism.css" />
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
+   
+</head>
+<body>
+    <header>
+        <h1 id="nombre-actividad" class="nombre-actividad">Actividad 3</h1>
+    <nav>
+      <a href="#nombre-actividad" class="nav-link">Inicio</a>
+      <a href="#consultas" class="nav-link">Consultas</a>
+      <a href="#dashboard" class="nav-link">Dashboard</a>
+    </nav>
+    </header>
+    <script src="prism.js"></script>
+    <p style=font-size:100px> </p>
+    
+    <div>
+    <p style="font-size: 20px;"> Tienda Virtual - Jhosep Ricardo Varela Regalado </p>
+    <p style=font-size:100px> </p>
+    <h2 id="consultas">Consultas:</h2>
+    <p style=font-size:50px> </p>
+    <p>1. ¿Cuál es el producto más vendido en una ubicación geográfica específica?</p>
+    <p>Para responder esta pregunta se ha elegido el departamento del Altlántico como la ubicación geográfica y para realizar la consulta se han agrupado las tablas clientes, compras y productos tomando solo las lineas en las que el departamento es el Altlántico, para luego agruparlas por producto contando la cantidad de compras que se han hecho de cada uno.</p>
+
+    <pre><code class="language-sql">
+    WITH clientes_compras AS (SELECT cli.departamento,cli.numero, com.producto
+    FROM 'TiendaVirtual.tv_clientes' cli  INNER JOIN 'TiendaVirtual.tv_compras' com ON cli.numero=com.cliente),
+
+    compras_altlantico AS ( SELECT departamento, pro.codigo, pro.producto
+    FROM clientes_compras cic INNER JOIN 'TiendaVirtual.tv_producto' pro ON cic.producto=pro.Codigo
+    where departamento='Atlántico')
+
+    SELECT producto, count(producto) as compras_totales FROM compras_altlantico
+    group by producto ORDER BY compras_totales DESC
+    </code></pre>
+
+    <p>Esta consulta nos da como resultado que el producto más vendido en el Altlántico es el café con 8197 compras.</p>
+    <p style=font-size:75px> </p>
+    <p>2. ¿Cuántos clientes han comprado productos de un rango de precios específico?</p>
+    <p>El rango de precios asignado es de 5000 a 15000, para la consulta se agruparon las tablas clientes, compras y productos tomando solo las lineas en las que el precio del producto está entre 5000 y 15000, para luego agrupar por producto y contar los distintos clientes que los han comprado. Luego con base en la tabla anterior se suman la cantidad de compras para obtener las compras totales.</p>
+    
+    <pre><code class="language-sql">
+    with compras_por_producto as (SELECT prod.producto as producto, COUNT(DISTINCT cli.Numero) AS num_clientes 
+    FROM 'TiendaVirtual.tv_clientes' cli JOIN 'TiendaVirtual.tv_compras' com ON cli.numero=com.cliente join 'TiendaVirtual.tv_producto' prod on com.producto=prod.codigo 
+    where precio between 5000 and 15000 group by producto)
+    select sum(num_clientes) as compras_totales from compras_por_producto</code></pre>
+    
+    <p>Esta consulta nos da como resultado que 1227 clientes han hecho compras de productos con un valor entre 5000 y 15000.</p>
+    <p style=font-size:75px> </p>
+    <p>3. ¿Cuáles son los clientes más frecuentes en realizar compras y cuánto han gastado en total?</p>
+    <p>Para esta consulta se agrupan las tablas clientes, compras y productos, y luego se agrupan los clientes contando las compras, sumando los gastos totales, organizando los datos en orden descendente de los numeros de compras y seleccionando los primeros 10 clientes.</p>
+    <pre><code class="language-sql">
+    WITH clientes_compras AS (SELECT Apellidos, Nombre_1, Nombre_2, com.producto
+    FROM 'TiendaVirtual.tv_clientes' cli  INNER JOIN 'TiendaVirtual.tv_compras' com ON cli.numero=com.cliente),
+    
+    clientes_compras_producto AS (SELECT cic.*, pro.Precio
+    FROM clientes_compras cic INNER JOIN 'TiendaVirtual.tv_producto' pro ON cic.producto=pro.Codigo)
+        
+    SELECT Nombre_1, Nombre_2, Apellidos, count(producto) as compras_totales, sum(precio)as gasto_total
+    FROM clientes_compras_producto GROUP BY Apellidos, Nombre_1, Nombre_2
+    ORDER BY compras_totales DESC limit 10
+    </code></pre>
+    <p style=font-size:75px> </p>
+    <p>4. ¿Cuál es el producto más vendido en cada ubicación geográfica?</p>
+    <p>Para esta consulta se delimitó la ubicacion geografica como los departamentos, se agruparon los datos por departamento y producto, contando las compras de cada producto y organizando los datos por compras en orden descendente.</p>
+    <pre><code class="language-sql">
+    WITH ventas_por_producto AS (SELECT departamento,prod.producto, count(numero) AS cantidad_vendida,
+    ROW_NUMBER() OVER (PARTITION BY Departamento ORDER BY count(Numero) DESC) AS r
+    FROM 'TiendaVirtual.tv_clientes'cli JOIN 'TiendaVirtual.tv_compras' com ON cli.numero = com.cliente 
+    JOIN 'TiendaVirtual.tv_producto' prod ON com.producto = prod.Codigo GROUP BY departamento, prod.producto)
+
+    SELECT departamento,producto, ventas_por_producto.cantidad_vendida
+    FROM ventas_por_producto WHERE r = 1
+    </code></pre>
+    <p style=font-size:75px> </p>
+    <p>5. ¿Cuáles son los clientes que han comprado todos los productos disponibles?</p>
+    <p>Para responder esta pregunta primero se agrupan los datos por cliente contando los productos distintos que han comprado ordenandolos en orden descendente, mostrando que la cantidad maxima de productos distintos comprados son 10.</p>
+    <p>Luego se realiza la consulta de los clientes que compraron los 10 productos disponibles y nos da como resultado que 8 clientes en total han comprado todos los productos disponibles.</p>
+    <pre><code class="language-sql">
+    select apellidos, Nombre_1, Nombre_2, productos_distintos_comprados from (SELECT apellidos, Nombre_1, Nombre_2, count(distinct producto)as productos_distintos_comprados
+    FROM 'TiendaVirtual.tv_clientes' cli JOIN 'TiendaVirtual.tv_compras' com ON cli.numero = com.cliente 
+    group by apellidos, nombre_1, nombre_2 order by productos_distintos_comprados desc)
+    where productos_distintos_comprados=10
+    </code></pre>
+    <p style=font-size:100px> </p>
+    <h3 id="dashboard">Dashboard:</h3>
+    <p>Haga click <a href="https://lookerstudio.google.com/reporting/8329abe3-cd63-4482-9ebe-57a498907c7d">aquí</a> para ver el Dashboard con los resultados de las consultas previas.</p>
+    <p style=font-size:100px> </p>
+</div>
+</body>
+</html>

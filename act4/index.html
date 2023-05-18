@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad 4</title>
+    <link rel="stylesheet" href="prism.css" />
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
+   
+</head>
+<body>
+    <header>
+        <h1 id="nombre-actividad" class="nombre-actividad">Actividad 4</h1>
+    <nav>
+      <a href="#nombre-actividad" class="nav-link">Inicio</a>
+      <a href="#consulta" class="nav-link">Consulta</a>
+      <a href="#dashboard" class="nav-link">Resultado</a>
+    </nav>
+    </header>
+    <script src="prism.js"></script>
+    <p style=font-size:100px> </p>
+    <div>
+    <p style="font-size: 20px;"> Tienda Virtual - Jhosep Ricardo Varela Regalado </p>
+    <p style=font-size:50px> </p>
+    <h2>Pregunta a responder:</h2>
+    <p>¿Cuantos accidentes con más de dos vehiculos involucrados se presentaron en el año 2022 en Barranquilla por mes?</p>
+    <p style=font-size:70px> </p>
+
+    <h3 id="consulta">Consulta:</h3>
+    <p>Para responder esta pregunta se seleccionan los datos del dataset donde el año sea 2022 y la cantidad de vehiculos sea mayor que 2, se cuenta la cantidad de accidentes agrupados por mes y ordenados por mes ascendentemente.</p>
+    <pre><code class="language-sql">
+    select MES_ACCIDENTE, count(CANTIDAD_VEHICULOS) as numero_accidentes
+    from 'AccidentesBaq.Accidentes' 
+    where A__O_ACCIDENTE=2022 and CANTIDAD_VEHICULOS>2
+    group by MES_ACCIDENTE order by MES_ACCIDENTE asc
+    </code></pre>
+
+    <p style=font-size:100px> </p>
+    <h3 id="dashboard">Resultado:</h3>
+    <p>Para ver el dashboard con el resultado de la consulta haga click <a href="https://lookerstudio.google.com/reporting/bb67f1c8-e876-4aa0-ace5-2c892c5af4fb">aquí</a>.</p>
+    <p style=font-size:100px> </p>
+</div>
+</body>
+</html>
