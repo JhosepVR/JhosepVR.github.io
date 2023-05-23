@@ -29,16 +29,15 @@
     <p>Puede encontrar el dataset objeto de esta consulta dando click <a href="https://www.datos.gov.co/Transporte/Accidentalidad-Barranquilla-detalle-de-Veh-culos/nfa3-wgxy">aquí</a>.</p>
     <p style=font-size:70px> </p>
     <h2>Pregunta a responder:</h2>
-    <p>¿Cuantos accidentes con más de dos vehiculos involucrados se presentaron en el año 2022 en Barranquilla por mes?</p>
+    <p>¿Que tipo de vehiculo fue el más accidentado en Barranquilla en el mes de Mayo en 2022?</p>
     <p style=font-size:70px> </p>
 
     <h3 id="consulta">Consulta:</h3>
-    <p>Para responder esta pregunta se seleccionan los datos del dataset donde el año sea 2022 y la cantidad de vehiculos sea mayor que 2, se cuenta la cantidad de accidentes agrupados por mes y ordenados por mes ascendentemente.</p>
+    <p>Para responder esta pregunta se seleccionan los datos del dataset donde el año sea 2022 y el mes sea el numero 5, se agrupan por clases de vehiculos sumando la cantidad de vehiculos y ordenados por cantidad de vehiculos descendentemente.</p>
     <pre><code class="language-sql">
-    select MES_ACCIDENTE, count(CANTIDAD_VEHICULOS) as numero_accidentes
-    from 'AccidentesBaq.Accidentes' 
-    where A__O_ACCIDENTE=2022 and CANTIDAD_VEHICULOS>2
-    group by MES_ACCIDENTE order by MES_ACCIDENTE asc
+    select CLASE_VEHICULO_ACCIDENTADO, sum(CANTIDAD_VEHICULOS)as CANTIDAD_VEHICULOS 
+    from 'AccidentesBaq.Accidentes' where A__O_ACCIDENTE=2022 and MES_ACCIDENTE=5
+    group by CLASE_VEHICULO_ACCIDENTADO order by CANTIDAD_VEHICULOS desc
     </code></pre>
 
     <p style=font-size:100px> </p>
